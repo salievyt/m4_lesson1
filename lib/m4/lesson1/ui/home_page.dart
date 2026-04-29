@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:m4_lesson1/notify/counter_model.dart';
-import 'package:m4_lesson1/notify/hm_model.dart';
+import 'package:m4_lesson1/m4/lesson1/notify/counter_model.dart';
+import 'package:m4_lesson1/m4/lesson1/notify/hm_model.dart';
 import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {

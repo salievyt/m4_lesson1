@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:m4_lesson1/notify/counter_model.dart';
-import 'package:m4_lesson1/notify/hm_model.dart';
-import 'package:m4_lesson1/ui/home_page.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:m4_lesson1/m4/lesson2/view/counter_page.dart';
+import 'package:m4_lesson1/m4/lesson2/viewmodel/counter_block.dart';
 
 void main() {
   runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => CounterModel()),
-        ChangeNotifierProvider(create: (_) => HmModel()),
-      ],
-      child: const MainApp(),
-    ),
+    // MultiProvider(
+    //   providers: [
+    //     ChangeNotifierProvider(create: (_) => CounterModel()),
+    //     ChangeNotifierProvider(create: (_) => HmModel()),
+    //   ],
+    //   child: const MainApp(),
+    // ),
+    const MainApp()
   );
 }
 
@@ -21,8 +21,11 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: HomePage(),
+    return MaterialApp(
+      home: BlocProvider(
+        create: (_) => CounterBlock(),
+        child: CounterPage(),
+      ),
     );
   }
 }
