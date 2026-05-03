@@ -1,6 +1,35 @@
+import 'package:equatable/equatable.dart';
 import 'package:m4_lesson1/model/data/weather_model.dart';
 
-class WeatherState {
-  final WeatherModel weatherModel;
-  WeatherState(this.weatherModel);
+abstract class WeatherState extends Equatable {
+  const WeatherState();
+
+  @override
+  List<Object?> get props => [];
+}
+
+class WeatherInitial extends WeatherState {
+  const WeatherInitial();
+}
+
+class WeatherLoading extends WeatherState {
+  const WeatherLoading();
+}
+
+class WeatherLoaded extends WeatherState {
+  final WeatherModel weather;
+
+  const WeatherLoaded(this.weather);
+
+  @override
+  List<Object?> get props => [weather];
+}
+
+class WeatherError extends WeatherState {
+  final String message;
+
+  const WeatherError(this.message);
+
+  @override
+  List<Object?> get props => [message];
 }

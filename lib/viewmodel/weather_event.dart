@@ -1,5 +1,16 @@
-abstract class WeatherEvent {}
+import 'package:equatable/equatable.dart';
 
-class ModeDayEvent extends WeatherEvent{}
-class ModeNightEvent extends WeatherEvent{}
-class GetWeatherEvent extends WeatherEvent{}
+abstract class WeatherEvent extends Equatable {
+  const WeatherEvent();
+
+  @override
+  List<Object?> get props => [];
+}
+
+class LoadWeatherEvent extends WeatherEvent {
+  final String city;
+  const LoadWeatherEvent(this.city);
+
+  @override
+  List<Object?> get props => [city];
+}

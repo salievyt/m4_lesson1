@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:m4_lesson1/model/service/weather_service.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:m4_lesson1/viewmodel/weather_bloc.dart';
+import 'package:m4_lesson1/viewmodel/weather_event.dart';
+import 'package:m4_lesson1/viewmodel/weather_state.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -10,51 +13,47 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-
-  String formatUnixTimestamp(int unixTimestamp, String zoneId) {
-    // Переводим секунды в миллисекунды и создаем DateTime
-    // Обрати внимание: DateTime.fromMillisecondsSinceEpoch по умолчанию
-    // работает в UTC или местном времени.
+  String formatUnixTimestamp(int unixTimestamp) {
     final date = DateTime.fromMillisecondsSinceEpoch(
       unixTimestamp * 1000,
       isUtc: true,
     );
-
-    // В Dart работа с конкретными zoneId (напр. "Europe/London") через стандартный
-    // DateTime ограничена. Обычно используют .toLocal() или .toUtc().
-    // Если нужна строгая поддержка ZoneId, используется пакет timezone.
-
     final formatter = DateFormat("HH' mm'", 'en_US');
     return formatter.format(date);
   }
 
   @override
+  void initState() {
+    super.initState();
+    context.read<WeatherBloc>().add(const LoadWeatherEvent('Bishkek'));
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final WeatherAPI api = WeatherAPI();
-    api.fethWeather('London');
     return Scaffold(
       body: Column(
         children: [
           SizedBox(
             width: double.infinity,
-            child: Image.asset("assets/day.png"),
+            child: Image.asset('assets/day.png'),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: FutureBuilder(
-              future: api.fethWeather("Bishkek"),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
+            child: BlocBuilder<WeatherBloc, WeatherState>(
+              builder: (context, state) {
+                if (state is WeatherLoading || state is WeatherInitial) {
                   return const Center(child: CircularProgressIndicator());
                 }
-                if (snapshot.hasError) {
-                  return Center(child: Text('Ошибка: ${snapshot.error}'));
+
+                if (state is WeatherError) {
+                  return Center(child: Text('Ошибка: ${state.message}'));
                 }
 
-                final weather = snapshot.data!;
-                int? temp_c = int.tryParse(
-                  weather.currentModel.temp_c.toString(),
-                );
+                if (state is! WeatherLoaded) {
+                  return const SizedBox.shrink();
+                }
+
+                final weather = state.weather;
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -63,57 +62,61 @@ class _HomePageState extends State<HomePage> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(weather.location.localtime),
-                        Spacer(),
+                        const Spacer(),
                         ElevatedButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            context.read<WeatherBloc>().add(
+                              const LoadWeatherEvent('London'),
+                            );
+                          },
                           child: Text(weather.location.name),
                         ),
                       ],
                     ),
-                    SizedBox(height: 40),
+                    const SizedBox(height: 40),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Spacer(),
+                        const Spacer(),
                         Column(
                           children: [
                             SizedBox(
                               width: 50,
                               height: 50,
                               child: Image.network(
-                                "http:${weather.currentModel.condition.icon}",
+                                'http:${weather.currentModel.condition.icon}',
                               ),
                             ),
                             Text(
                               weather.currentModel.condition.text,
-                              style: TextStyle(fontSize: 18),
+                              style: const TextStyle(fontSize: 18),
                             ),
                           ],
                         ),
-                        Spacer(),
+                        const Spacer(),
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              "${weather.currentModel.temp_c?.toInt()}",
-                              style: TextStyle(
+                              '${weather.currentModel.temp_c?.toInt()}',
+                              style: const TextStyle(
                                 fontSize: 64,
                                 fontWeight: FontWeight.w300,
                               ),
                             ),
-                            Text("°C", style: TextStyle(fontSize: 22)),
+                            const Text('°C', style: TextStyle(fontSize: 22)),
                           ],
                         ),
-                        Spacer(),
+                        const Spacer(),
                         Column(
                           children: [
                             Row(
                               children: [
                                 Text(
-                                  "${weather.forecastModel.forecastday[0].day.maxTempC}°C",
-                                  style: TextStyle(fontSize: 20),
+                                  '${weather.forecastModel.forecastday[0].day.maxTempC}°C',
+                                  style: const TextStyle(fontSize: 20),
                                 ),
-                                SizedBox(width: 2),
+                                const SizedBox(width: 2),
                                 SizedBox(
                                   width: 6,
                                   child: Image.asset('assets/arrow_up.png'),
@@ -123,10 +126,10 @@ class _HomePageState extends State<HomePage> {
                             Row(
                               children: [
                                 Text(
-                                  "${weather.forecastModel.forecastday[0].day.minTempC}°C",
-                                  style: TextStyle(fontSize: 20),
+                                  '${weather.forecastModel.forecastday[0].day.minTempC}°C',
+                                  style: const TextStyle(fontSize: 20),
                                 ),
-                                SizedBox(width: 2),
+                                const SizedBox(width: 2),
                                 SizedBox(
                                   width: 6,
                                   child: Image.asset('assets/arrow_down.png'),
@@ -135,12 +138,12 @@ class _HomePageState extends State<HomePage> {
                             ),
                           ],
                         ),
-                        Spacer(),
+                        const Spacer(),
                       ],
                     ),
-                    SizedBox(height: 40),
+                    const SizedBox(height: 40),
                     WeatherDataWidget(
-                      images: [
+                      images: const [
                         'assets/humidity.png',
                         'assets/barometer.png',
                         'assets/wind.png',
@@ -150,12 +153,11 @@ class _HomePageState extends State<HomePage> {
                         '${weather.currentModel.pressure_mb.toInt()}mBar',
                         '${weather.currentModel.wind_kph.toInt()} km/h',
                       ],
-                      titles: ['Humidity', 'Pressure', 'Wind'],
+                      titles: const ['Humidity', 'Pressure', 'Wind'],
                     ),
-                    SizedBox(height: 40),
-
+                    const SizedBox(height: 40),
                     WeatherDataWidget(
-                      images: [
+                      images: const [
                         'assets/sunset.png',
                         'assets/sunrise.png',
                         'assets/sand_time.png',
@@ -163,9 +165,9 @@ class _HomePageState extends State<HomePage> {
                       datas: [
                         weather.forecastModel.forecastday[0].astroModel.sunset,
                         weather.forecastModel.forecastday[0].astroModel.sunrise,
-                        (formatUnixTimestamp(weather.location.localtime_epoch, weather.location.zoneId)),
+                        formatUnixTimestamp(weather.location.localtime_epoch),
                       ],
-                      titles: ['Sunset', 'Sunrise', 'Daytime'],
+                      titles: const ['Sunset', 'Sunrise', 'Daytime'],
                     ),
                   ],
                 );
@@ -179,10 +181,11 @@ class _HomePageState extends State<HomePage> {
 }
 
 class WeatherDataWidget extends StatelessWidget {
-  List<String> images;
-  List<String> datas;
-  List<String> titles;
-  WeatherDataWidget({
+  final List<String> images;
+  final List<String> datas;
+  final List<String> titles;
+
+  const WeatherDataWidget({
     super.key,
     required this.images,
     required this.datas,
@@ -193,46 +196,43 @@ class WeatherDataWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Spacer(),
+        const Spacer(),
         Column(
           children: [
             SizedBox(width: 40, height: 40, child: Image.asset(images[0])),
-            SizedBox(height: 6),
-            Text(datas[0], style: TextStyle(fontSize: 22)),
-
+            const SizedBox(height: 6),
+            Text(datas[0], style: const TextStyle(fontSize: 22)),
             Text(
               titles[0],
-              style: TextStyle(fontSize: 14, color: Color(0xFF999999)),
+              style: const TextStyle(fontSize: 14, color: Color(0xFF999999)),
             ),
           ],
         ),
-        Spacer(),
+        const Spacer(),
         Column(
           children: [
             SizedBox(width: 40, height: 40, child: Image.asset(images[1])),
-            SizedBox(height: 6),
-            Text(datas[1], style: TextStyle(fontSize: 22)),
-
+            const SizedBox(height: 6),
+            Text(datas[1], style: const TextStyle(fontSize: 22)),
             Text(
               titles[1],
-              style: TextStyle(fontSize: 14, color: Color(0xFF999999)),
+              style: const TextStyle(fontSize: 14, color: Color(0xFF999999)),
             ),
           ],
         ),
-        Spacer(),
+        const Spacer(),
         Column(
           children: [
             SizedBox(width: 40, height: 40, child: Image.asset(images[2])),
-            SizedBox(height: 6),
-            Text(datas[2], style: TextStyle(fontSize: 22)),
-
+            const SizedBox(height: 6),
+            Text(datas[2], style: const TextStyle(fontSize: 22)),
             Text(
               titles[2],
-              style: TextStyle(fontSize: 14, color: Color(0xFF999999)),
+              style: const TextStyle(fontSize: 14, color: Color(0xFF999999)),
             ),
           ],
         ),
-        Spacer(),
+        const Spacer(),
       ],
     );
   }
