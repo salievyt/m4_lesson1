@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:m4_lesson1/m4/lesson3/service/user_service.dart';
+import 'package:m4_lesson1/model/data/weather_model.dart';
+import 'package:m4_lesson1/view/home_page.dart';
 
-import 'm4/lesson3/data/user_model.dart';
+import 'model/service/weather_service.dart';
+
 
 void main() {
   runApp(const MainApp());
@@ -13,7 +15,8 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const MaterialApp(
-      home: WeatherScreen(),
+      debugShowCheckedModeBanner: false,
+      home: HomePage(),
     );
   }
 }
@@ -23,11 +26,11 @@ class WeatherScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final UserApi userApi = UserApi();
+    final WeatherAPI api = WeatherAPI();
 
     return Scaffold(
       body: FutureBuilder<WeatherModel>(
-        future: userApi.fethUsers('London'),
+        future: api.fethWeather('London'),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -46,6 +49,9 @@ class WeatherScreen extends StatelessWidget {
                 Text('Страна: ${weather.location.country}'),
                 Text('Широта: ${weather.location.lat}'),
                 Text('Долгота: ${weather.location.lon}'),
+                Text("data ${weather.currentModel.temp_c}"),
+                Text("data ${weather.currentModel.temp_f}"),
+                Text("data ${weather.currentModel.is_day}"),
               ],
             ),
           );
