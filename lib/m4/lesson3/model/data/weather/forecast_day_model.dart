@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
-import 'package:m4_lesson1/model/data/astro_model.dart';
-import 'package:m4_lesson1/model/data/day_model.dart';
+import 'package:m4_lesson1/m4/lesson3/model/data/weather/astro_model.dart';
+import 'package:m4_lesson1/m4/lesson3/model/data/weather/day_model.dart';
 
 class ForecastDayModel extends Equatable {
   final String date;

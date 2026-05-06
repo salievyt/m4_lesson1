@@ -1,8 +1,8 @@
 import 'package:equatable/equatable.dart';
 
-import 'package:m4_lesson1/model/data/current_model.dart';
-import 'package:m4_lesson1/model/data/forecast_model.dart';
-import 'package:m4_lesson1/model/data/location_model.dart';
+import 'package:m4_lesson1/m4/lesson3/model/data/weather/current_model.dart';
+import 'package:m4_lesson1/m4/lesson3/model/data/weather/forecast_model.dart';
+import 'package:m4_lesson1/m4/lesson3/model/data/weather/location_model.dart';
 
 class WeatherModel extends Equatable {
   final ForecastModel forecastModel;
@@ -32,7 +32,8 @@ class WeatherModel extends Equatable {
   @override
   List<Object?> get props => [
     location,
-    // currentModel,
+    forecastModel,
+    currentModel,
     wind_kph,
     wind_mph
   ];

@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:m4_lesson1/model/data/current_model.dart';
+import 'package:m4_lesson1/m4/lesson3/model/data/weather/current_model.dart';
 
 class DayModel extends Equatable {
 

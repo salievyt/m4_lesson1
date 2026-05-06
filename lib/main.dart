@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:m4_lesson1/model/service/weather_service.dart';
-import 'package:m4_lesson1/view/home_page.dart';
-import 'package:m4_lesson1/viewmodel/weather_bloc.dart';
+import 'package:m4_lesson1/m4/lesson3/model/service/weather_service.dart';
+import 'package:m4_lesson1/m4/lesson3/view/home_page.dart';
+import 'package:m4_lesson1/m4/lesson3/viewmodel/weather_bloc.dart';
 
 void main() {
   runApp(const MainApp());
