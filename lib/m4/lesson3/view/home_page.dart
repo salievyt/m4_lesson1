@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:m4_lesson1/m4/lesson3/view/bottom_dialog.dart';
+import 'package:m4_lesson1/m4/lesson3/viewmodel/theme_bloc.dart';
+import 'package:m4_lesson1/m4/lesson3/viewmodel/theme_event.dart';
 import 'package:m4_lesson1/m4/lesson3/viewmodel/weather_bloc.dart';
 import 'package:m4_lesson1/m4/lesson3/viewmodel/weather_event.dart';
 import 'package:m4_lesson1/m4/lesson3/viewmodel/weather_state.dart';
@@ -50,13 +52,62 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
+      appBar: AppBar(title: Text(_selectedLocation ?? 'Weather')),
+      drawer: Drawer(
+        child: SafeArea(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Padding(
+                padding: EdgeInsets.all(16),
+                child: Text(
+                  'Настройки темы',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+                ),
+              ),
+              RadioListTile<ThemeMode>(
+                title: const Text('Светлая'),
+                value: ThemeMode.light,
+                groupValue: context.read<ThemeBloc>().state.themeMode,
+                onChanged: (value) {
+                  if (value != null) {
+                    context.read<ThemeBloc>().add(ChangeThemeEvent(value));
+                  }
+                },
+              ),
+              RadioListTile<ThemeMode>(
+                title: const Text('Темная'),
+                value: ThemeMode.dark,
+                groupValue: context.read<ThemeBloc>().state.themeMode,
+                onChanged: (value) {
+                  if (value != null) {
+                    context.read<ThemeBloc>().add(ChangeThemeEvent(value));
+                  }
+                },
+              ),
+              RadioListTile<ThemeMode>(
+                title: const Text('Системная'),
+                value: ThemeMode.system,
+                groupValue: context.read<ThemeBloc>().state.themeMode,
+                onChanged: (value) {
+                  if (value != null) {
+                    context.read<ThemeBloc>().add(ChangeThemeEvent(value));
+                  }
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
       body: SingleChildScrollView(
         child: Column(
           children: [
             SizedBox(
               width: double.infinity,
-              child: Image.asset('assets/day.png'),
+              child: Image.asset(isDarkMode ? 'assets/night.png' : 'assets/day.png'),
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
